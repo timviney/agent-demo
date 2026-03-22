@@ -1,4 +1,5 @@
 ﻿using Spectre.Console;
+using System.Text;
 
 namespace AgentDemo;
 
@@ -11,44 +12,84 @@ public sealed class TerminalUi
         Current = this;
     }
 
+    private static readonly BoxBorder DefaultBorder = BoxBorder.Rounded;
+    private static readonly Style AccentStyle = new(Color.CornflowerBlue);
+
     public void ShowBanner()
     {
-        AnsiConsole.MarkupLine("[bold green]HelperBot[/] [grey]ready.[/]");
-        AnsiConsole.MarkupLine("[grey]Type a question and press Enter (empty line to exit).[/]");
+        var banner = new Panel(
+            new Markup("[bold green]HelperBot[/]\n[grey]Type a question and press Enter (empty line to exit).[/]"))
+        {
+            Border = DefaultBorder,
+            Header = new PanelHeader("[bold deepskyblue1]Chat Assistant[/]", Justify.Center),
+            Padding = new Padding(1, 0, 1, 0)
+        };
+
+        banner.BorderStyle = AccentStyle;
+
+        AnsiConsole.Write(banner);
+        AnsiConsole.WriteLine();
+    }
+
+    public static Panel CreateAssistantPanel(string message, bool includeMarkup = false)
+    {
+        var safeMessage = includeMarkup? message : $"[white]{Markup.Escape(message)}[/]";
+
+        var panel = new Panel(new Markup(safeMessage))
+        {
+            Header = new PanelHeader("[bold yellow]Assistant[/]", Justify.Left),
+            Border = DefaultBorder,
+            Padding = new Padding(1, 0, 1, 0)
+        };
+
+        panel.BorderStyle = new Style(Color.Yellow);
+        return panel;
     }
 
     public string PromptQuestion()
     {
+        AnsiConsole.MarkupLine("[bold cyan]You[/]");
+
         return AnsiConsole.Prompt(
-            new TextPrompt<string>("[bold cyan]>[/]")
+            new TextPrompt<string>("[bold cyan]>[/] ")
                 .AllowEmpty());
     }
 
     public async Task WriteAnswerAsync(IAsyncEnumerable<string> chunks)
     {
         AnsiConsole.WriteLine();
-
-        var loader = new Loader();
-        loader.Start();
         
-        try
-        {
-            // Live stream pass
-            await foreach (var chunk in chunks)
+        var panel = CreateAssistantPanel(string.Empty);
+
+        await AnsiConsole.Live(panel)
+            .AutoClear(false)
+            .StartAsync(async ctx =>
             {
-                if (loader.IsRunning)
+                var loader = new Loader(ctx);
+                var fullResponse = new StringBuilder();
+                
+                try
+                {
+                    loader.Start();
+                    
+                    await foreach (var chunk in chunks)
+                    {
+                        if (loader.IsRunning)
+                        {
+                            await loader.Stop();
+                        }
+
+                        fullResponse.Append(chunk);
+                        ctx.UpdateTarget(CreateAssistantPanel(fullResponse.ToString()));
+                    }
+                }
+                finally
                 {
                     await loader.Stop();
+                    ctx.UpdateTarget(CreateAssistantPanel(fullResponse.ToString()));
                 }
-                AnsiConsole.Write(chunk);
-            }
-        }
-        finally
-        {
-            await loader.Stop();
-        }
+            });
 
-        AnsiConsole.WriteLine();
         AnsiConsole.WriteLine();
     }
 
@@ -71,7 +112,7 @@ public sealed class TerminalUi
         var panel = new Panel(details)
         {
             Header = new PanelHeader("[bold green]Email sent[/]", Justify.Center),
-            Border = BoxBorder.Rounded,
+            Border = DefaultBorder,
             Padding = new Padding(1, 0, 1, 0)
         };
 

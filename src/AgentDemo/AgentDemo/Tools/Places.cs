@@ -6,7 +6,7 @@ public class Places
 {
     private static readonly HttpClient Http = new();
 
-    [Description("Search for the top 10 places matching a name and return raw JSON results.")]
+    [Description("Search for the top 10 places matching a name and return raw JSON results. This contains information such as id to use for more specific weather queries, as well as country, timezone, and coordinates.")]
     public static async Task<string> SearchPlaces([Description("The place name to search for.")] string place)
     {
         if (string.IsNullOrWhiteSpace(place))

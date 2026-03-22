@@ -42,6 +42,14 @@ public class GetContacts
                 PhoneNumber = "+44-7700-900103",
                 Relationship = "Friend",
                 Location = "Birmingham, UK"
+            },
+            new
+            {
+                Name = "Bruce Evans",
+                Email = "bruce.evans@example.com",
+                PhoneNumber = "+44-00-990333",
+                Relationship = "Client",
+                Location = "Sydney, Australia"
             }
         };
 

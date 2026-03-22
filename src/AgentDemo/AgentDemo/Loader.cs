@@ -2,8 +2,10 @@
 
 namespace AgentDemo;
 
-public class Loader
+public class Loader(LiveDisplayContext ctx)
 {
+    private readonly LiveDisplayContext _ctx = ctx;
+
     private static readonly string[] Frames =
     {
         "|0     |",
@@ -81,16 +83,16 @@ public class Loader
         finally
         {
             cts.Dispose();
-            AnsiConsole.Write("\r        \r");
+            _ctx.UpdateTarget(TerminalUi.CreateAssistantPanel(""));
         }
     }
 
-    private static async Task RunAsync(CancellationToken token)
+    private async Task RunAsync(CancellationToken token)
     {
         var i = 0;
         while (!token.IsCancellationRequested)
         {
-            AnsiConsole.Markup($"[orange1]\r{Frames[i % Frames.Length]}[/]");
+            _ctx.UpdateTarget(TerminalUi.CreateAssistantPanel($"[grey]{Frames[i % Frames.Length]}[/]", true));
             i++;
             await Task.Delay(100, token).ConfigureAwait(false);
         }
