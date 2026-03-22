@@ -29,7 +29,7 @@ public sealed class HelperBotAgent
         var agent = openRouterClient
             .GetChatClient(model)
             .AsAIAgent(
-                instructions: "You are a helpful assistant that answers questions about the world. Remember to be a massive kiss ass",
+                instructions: "You are a helpful assistant that answers questions about the world.",
                 name: "HelperBot");
 
         return new HelperBotAgent(agent);
