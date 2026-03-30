@@ -11,8 +11,10 @@ public class Weather
     private static readonly HttpClient Http = new();
 
     [Description("Get the weather for a given location. This returns the largest known place, so search via ID to be more specific. Remember that users may provide ambiguous location names, so you should decide what to search for based on the User's location")]
-    public static async Task<string> GetWeather([Description("The location to get the weather for in string format.")] string location)
+    public static async Task<string> GetWeather([Description("The location name to get the weather for. Include only the name of the of the settlement, no other identifiers")] string location)
     {
+        TerminalUi.Current?.LogToolUse(nameof(GetWeather), (nameof(location), location));
+
         if (string.IsNullOrWhiteSpace(location))
         {
             return "Please provide a location.";
@@ -57,6 +59,8 @@ public class Weather
     [Description("Get the weather for a given location id.")]
     public static async Task<string> GetWeatherById([Description("The location id to get the weather")] string locationId)
     {
+        TerminalUi.Current?.LogToolUse(nameof(GetWeatherById), (nameof(locationId), locationId));
+
         if (string.IsNullOrWhiteSpace(locationId))
         {
             return "Please provide a location ID.";

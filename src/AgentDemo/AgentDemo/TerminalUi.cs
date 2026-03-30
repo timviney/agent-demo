@@ -55,6 +55,22 @@ public sealed class TerminalUi
                 .AllowEmpty());
     }
 
+    public void LogToolUse(string toolName, params (string Name, object? Value)[] inputs)
+    {
+        static string FormatValue(object? value)
+        {
+            return value is null
+                ? "[grey](null)[/]"
+                : $"[white]{Markup.Escape(value.ToString().Substring(0, Math.Min(value.ToString().Length, 20)))}[/]";
+        }
+
+        var details = inputs.Length == 0
+            ? "[grey](no inputs)[/]"
+            : string.Join("[orange1], [/]", inputs.Select(input => $"[bold]{Markup.Escape(input.Name)}[/]= {FormatValue(input.Value)}"));
+
+        AnsiConsole.MarkupLine($"[orange1][bold]Tool[/] {Markup.Escape(toolName)} [grey]-[/] {details}[/]");
+    }
+
     public async Task WriteAnswerAsync(IAsyncEnumerable<string> chunks)
     {
         AnsiConsole.WriteLine();

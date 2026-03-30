@@ -20,17 +20,17 @@ public sealed class HelperBotAgent
 
     public static async Task<HelperBotAgent> CreateFromEnvironment()
     {
-        var openRouterKey = Environment.GetEnvironmentVariable("OPEN_ROUTER_KEY")
-            ?? throw new InvalidOperationException("OPEN_ROUTER_KEY environment variable is not set.");
+        var openAiKey = Environment.GetEnvironmentVariable("OPEN_AI_KEY")
+            ?? throw new InvalidOperationException("OPEN_AI_KEY environment variable is not set.");
 
-        var openRouterClient = new OpenAIClient(
-            new ApiKeyCredential(openRouterKey),
-            new OpenAIClientOptions { Endpoint = new Uri("https://openrouter.ai/api/v1") }
+        var openAiClient = new OpenAIClient(
+            new ApiKeyCredential(openAiKey),
+            new OpenAIClientOptions { Endpoint = new Uri("https://api.openai.com/v1") }
         );
 
-        const string model = "stepfun/step-3.5-flash:free";
+        const string model = "gpt-5";//"stepfun/step-3.5-flash:free";
 
-        var agent = openRouterClient
+        var agent = openAiClient
             .GetChatClient(model)
             .AsAIAgent(
                 instructions: "You are a helpful assistant that answers questions about the world. Use available tools when needed.",

@@ -7,6 +7,8 @@ public class UserDetails
     [Description("Get helpful information about the user.")]
     public static async Task<string> GetUserDetails()
     {
+        TerminalUi.Current?.LogToolUse(nameof(GetUserDetails));
+
         // Return hard-coded dummy user data
         var userInfo = new
         {

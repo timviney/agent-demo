@@ -7,6 +7,8 @@ public class GetContacts
     [Description("Get a list of dummy contacts for the user.")]
     public static async Task<string> GetContactsList()
     {
+        TerminalUi.Current?.LogToolUse(nameof(GetContactsList));
+
         await Task.CompletedTask;
 
         var contacts = new[]
